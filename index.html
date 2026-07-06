@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpDown Game - 프리미엄 숫자 맞추기</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 스크린 리더용 아나운서 (화면에는 보이지 않으나 접근성 읽기 지원) -->
+  <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- 불꽃놀이 효과용 캔버스 -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- 헤더 영역 -->
+    <header class="game-header">
+      <h1 class="brand-title">UP <span class="divider">&</span> DOWN</h1>
+      
+      <!-- 접근성 컨트롤 도구 바 -->
+      <div class="accessibility-toolbar" role="toolbar" aria-label="접근성 설정">
+        <div class="toolbar-group">
+          <span class="toolbar-label">글자 크기</span>
+          <button id="btn-zoom-out" class="toolbar-btn" aria-label="글자 크기 작게">-</button>
+          <button id="btn-zoom-reset" class="toolbar-btn" aria-label="글자 크기 기본">100%</button>
+          <button id="btn-zoom-in" class="toolbar-btn" aria-label="글자 크기 크게">+</button>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <button id="btn-contrast-toggle" class="toolbar-btn text-btn" aria-pressed="false">
+          <span class="icon">🌓</span> 고대비 모드
+        </button>
+        
+        <button id="btn-mute-toggle" class="toolbar-btn text-btn" aria-pressed="false">
+          <span class="icon" id="sound-icon">🔊</span> 소리 켬
+        </button>
+      </div>
+    </header>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="game-main">
+      
+      <!-- 1. 모드 선택 화면 -->
+      <section id="screen-mode-select" class="game-screen active">
+        <h2 class="screen-title">게임 모드를 선택하세요</h2>
+        <p class="screen-desc">컴퓨터가 생각한 1부터 100 사이의 숫자를 맞춰보세요!</p>
+        
+        <div class="mode-buttons-container">
+          <button id="btn-practice" class="mode-card practice">
+            <div class="card-icon">🎯</div>
+            <div class="card-info">
+              <h3>연습 모드</h3>
+              <p>기회 제한 없이 마음 편히 숫자를 맞추는 훈련을 진행합니다.</p>
+            </div>
+          </button>
+          
+          <button id="btn-challenge" class="mode-card challenge">
+            <div class="card-icon">⚡</div>
+            <div class="card-info">
+              <h3>도전 모드</h3>
+              <p>단 7번의 기회 안에 숫자를 맞춰보세요! 최고 기록에 도전하세요.</p>
+            </div>
+          </button>
+        </div>
+
+        <div id="high-score-wrapper" class="high-score-container" hidden>
+          <span class="medal-icon">🏆</span>
+          <span class="high-score-text">도전 모드 최고 기록: <strong id="best-score-value">-</strong>회</span>
+        </div>
+      </section>
+
+      <!-- 2. 게임 플레이 화면 -->
+      <section id="screen-game-play" class="game-screen" hidden>
+        <!-- 상단 내비게이션 및 정보 -->
+        <div class="play-header">
+          <button id="btn-go-back" class="icon-btn" aria-label="메인 화면으로 돌아가기">
+            <span class="back-icon">←</span> 처음으로
+          </button>
+          
+          <div id="lives-container" class="lives-indicator" aria-label="남은 기회">
+            <!-- JS에서 동적으로 채워짐 (도전모드에서만 활성화) -->
+          </div>
+        </div>
+
+        <!-- 실시간 숫자 범위 바 시각화 -->
+        <div class="range-visualization-container">
+          <div class="range-labels">
+            <span id="range-min-label">1</span>
+            <span class="range-current-text" id="range-guidance">현재 범위: 1 ~ 100</span>
+            <span id="range-max-label">100</span>
+          </div>
+          <div class="range-progress-track">
+            <div id="range-progress-fill" class="range-progress-fill" style="left: 0%; right: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- 게임 상태 판정 화면 (기본 상태/UP/DOWN) -->
+        <div class="status-display-wrapper">
+          <div id="status-panel" class="status-panel idle">
+            <div id="status-icon" class="status-icon">❓</div>
+            <div id="status-message" class="status-message">숫자를 입력하고 제출해 보세요!</div>
+          </div>
+        </div>
+
+        <!-- 입력 폼 -->
+        <form id="guess-form" class="guess-form" novalidate>
+          <div class="input-wrapper">
+            <input 
+              type="number" 
+              id="input-guess" 
+              name="guess"
+              min="1" 
+              max="100" 
+              required 
+              aria-describedby="range-guidance"
+              placeholder="숫자 입력 (1 ~ 100)"
+              autocomplete="off"
+            >
+            <button type="submit" id="btn-guess-submit" class="submit-btn">제출</button>
+          </div>
+          <span id="input-error-msg" class="input-error" role="alert" aria-live="polite" hidden></span>
+        </form>
+
+        <!-- 이전 기록 목록 -->
+        <section class="history-section" aria-labelledby="history-heading">
+          <h3 id="history-heading" class="history-title">시도 기록 (총 <span id="try-count">0</span>회)</h3>
+          <div class="history-container">
+            <ul id="history-list" class="history-list">
+              <!-- JS에서 동적으로 li 추가 -->
+            </ul>
+            <p id="no-history-text" class="no-history-msg">아직 입력한 기록이 없습니다.</p>
+          </div>
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 결과 알림 모달 다이얼로그 (접근성을 위해 role="dialog"와 aria-modal="true" 제공) -->
+  <div id="result-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-content">
+      <div id="modal-badge" class="modal-badge success">🎉</div>
+      <h2 id="modal-title" class="modal-title">성공했습니다!</h2>
+      <div class="modal-body">
+        <p id="modal-desc" class="modal-desc">축하합니다! 5번의 시도 끝에 정답 <strong>42</strong>를 맞추셨습니다.</p>
+        <div id="new-record-badge" class="new-record-badge" hidden>🆕 최고 기록 달성!</div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-modal-restart" class="modal-btn primary-btn">다시 시작하기</button>
+        <button id="btn-modal-close" class="modal-btn secondary-btn">결과 닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

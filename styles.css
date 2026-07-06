@@ -1,0 +1,835 @@
+/* ==========================================================================
+   1. CSS Reset & Variables (Design System)
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Fonts */
+  --font-primary: 'Outfit', 'Noto Sans KR', sans-serif;
+
+  /* Theme Colors (Default Premium Dark Mode) */
+  --bg-app: radial-gradient(circle at 50% 50%, #1a1b2f 0%, #0d0e15 100%);
+  --bg-card: rgba(25, 27, 44, 0.7);
+  --bg-input: rgba(10, 11, 20, 0.5);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-focus: #7c4dff;
+  
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-inverse: #0d0e15;
+  
+  /* Status Colors */
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #a78bfa;
+  --color-up: #ef4444; /* Red-Orange */
+  --color-down: #3b82f6; /* Blue-Cyan */
+  --color-success: #10b981; /* Green */
+  
+  /* Shadow & Blur */
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+  --glow-up: 0 0 25px rgba(239, 68, 68, 0.4);
+  --glow-down: 0 0 25px rgba(59, 130, 246, 0.4);
+  --glass-blur: blur(12px);
+
+  /* Accessibility Scales */
+  --zoom-factor: 1;
+}
+
+/* 2. High Contrast Theme override */
+body.high-contrast {
+  --bg-app: #000000;
+  --bg-card: #000000;
+  --bg-input: #000000;
+  --border-card: #ffffff;
+  --border-focus: #ffff00; /* Yellow for ultra visibility */
+  
+  --text-main: #ffffff;
+  --text-muted: #dddddd;
+  --text-inverse: #000000;
+  
+  --color-primary: #00ff00; /* Bright Green */
+  --color-primary-hover: #ffff00;
+  --color-up: #ff0000;
+  --color-down: #00ffff;
+  --color-success: #00ff00;
+  
+  --shadow-lg: none;
+  --shadow-glow: none;
+  --glow-up: none;
+  --glow-down: none;
+  --glass-blur: none;
+}
+
+/* ==========================================================================
+   2. Base Styles & Accessibility Layout
+   ========================================================================== */
+html {
+  font-size: calc(62.5% * var(--zoom-factor)); /* base 10px adjusted by zoom */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  background: var(--bg-app);
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Global Focus Styles for Accessibility */
+*:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 3px;
+  box-shadow: 0 0 10px var(--border-focus);
+}
+
+/* Canvas overlay for Confetti */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   3. Main Container & Layout
+   ========================================================================== */
+.app-container {
+  width: 90%;
+  max-width: 640px;
+  margin: 2rem auto;
+  z-index: 10;
+}
+
+/* Header & Accessibility Toolbar */
+.game-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.brand-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 3.6rem;
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c4dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 2px 8px rgba(124, 77, 255, 0.3));
+}
+
+.high-contrast .brand-title {
+  background: none;
+  -webkit-text-fill-color: var(--text-main);
+  filter: none;
+}
+
+.brand-title .divider {
+  font-weight: 300;
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+}
+
+/* Accessibility Toolbar */
+.accessibility-toolbar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  backdrop-filter: var(--glass-blur);
+  border-radius: 12px;
+  padding: 0.8rem 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.toolbar-label {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.toolbar-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-card);
+  color: var(--text-main);
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.toolbar-btn.text-btn {
+  width: auto;
+  height: auto;
+  padding: 0.6rem 1.2rem;
+  font-size: 1.3rem;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 2rem;
+  background: var(--border-card);
+}
+
+/* ==========================================================================
+   4. Screen Transitions & Common Styles
+   ========================================================================== */
+.game-screen {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  backdrop-filter: var(--glass-blur);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-screen[hidden] {
+  display: none !important;
+}
+
+.screen-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.screen-desc {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+/* ==========================================================================
+   5. Mode Select Screen
+   ========================================================================== */
+.mode-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  margin-bottom: 2rem;
+}
+
+.mode-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mode-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.mode-card.practice:hover {
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.15);
+}
+
+.mode-card.challenge:hover {
+  box-shadow: 0 10px 20px rgba(245, 158, 11, 0.15);
+}
+
+.card-icon {
+  font-size: 3.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  width: 6.4rem;
+  height: 6.4rem;
+  border-radius: 12px;
+}
+
+.card-info h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.card-info p {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.high-score-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1.4rem;
+}
+
+.medal-icon {
+  font-size: 1.8rem;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   6. Game Play Screen
+   ========================================================================== */
+.play-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lives-indicator {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 1.8rem;
+}
+
+.heart-icon {
+  color: #ef4444;
+  animation: heartBeat 1.2s ease-in-out infinite alternate;
+}
+
+.heart-icon.lost {
+  color: rgba(255, 255, 255, 0.1);
+  filter: grayscale(100%);
+  animation: none;
+}
+
+/* Range Visualization */
+.range-visualization-container {
+  margin-bottom: 2.5rem;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+.range-labels span {
+  font-weight: 600;
+}
+
+.range-current-text {
+  font-size: 1.4rem;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+}
+
+.range-progress-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.range-progress-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  border-radius: 4px;
+  transition: left 0.4s ease, right 0.4s ease;
+}
+
+/* Status Panel */
+.status-display-wrapper {
+  margin-bottom: 2.5rem;
+}
+
+.status-panel {
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.status-panel.idle {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.status-panel.up {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  box-shadow: var(--glow-up);
+  animation: pulseUp 1.5s infinite alternate;
+}
+
+.status-panel.down {
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: var(--glow-down);
+  animation: pulseDown 1.5s infinite alternate;
+}
+
+.status-icon {
+  font-size: 3.2rem;
+}
+
+.status-panel.up .status-icon {
+  animation: bounceUp 0.8s infinite alternate ease-in-out;
+}
+
+.status-panel.down .status-icon {
+  animation: bounceDown 0.8s infinite alternate ease-in-out;
+}
+
+.status-message {
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+/* Guess Form Input */
+.guess-form {
+  margin-bottom: 3rem;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+#input-guess {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1.4rem 1.8rem;
+  font-family: inherit;
+  font-size: 1.8rem;
+  color: inherit;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+/* Remove default number input spinner arrows */
+#input-guess::-webkit-outer-spin-button,
+#input-guess::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#input-guess[type=number] {
+  -moz-appearance: textfield;
+}
+
+#input-guess::placeholder {
+  color: var(--text-muted);
+  font-size: 1.5rem;
+}
+
+.submit-btn {
+  background: var(--color-primary);
+  border: none;
+  border-radius: 12px;
+  color: var(--text-inverse);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.6rem;
+  font-weight: 700;
+  padding: 0 3rem;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.input-error {
+  display: block;
+  color: #ef4444;
+  font-size: 1.3rem;
+  margin-top: 0.8rem;
+  padding-left: 0.5rem;
+}
+
+/* History Section */
+.history-section {
+  border-top: 1px solid var(--border-card);
+  padding-top: 2rem;
+}
+
+.history-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: var(--text-muted);
+}
+
+.history-container {
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.history-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.history-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.history-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 1rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.4rem;
+  animation: slideIn 0.3s ease;
+}
+
+.history-item .try-num {
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 4rem;
+}
+
+.history-item .guess-val {
+  font-weight: 700;
+  font-size: 1.6rem;
+  flex: 1;
+  text-align: left;
+}
+
+.history-item .result-tag {
+  font-weight: 600;
+  padding: 0.2rem 0.8rem;
+  border-radius: 4px;
+  font-size: 1.2rem;
+}
+
+.history-item .result-tag.tag-up {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-up);
+}
+
+.history-item .result-tag.tag-down {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--color-down);
+}
+
+.no-history-msg {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  padding: 2rem 0;
+}
+
+/* ==========================================================================
+   7. Modal Dialog
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay[hidden] {
+  display: none !important;
+}
+
+.modal-content {
+  background: #151624;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  max-width: 440px;
+  width: 100%;
+  padding: 3.5rem 3rem;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.high-contrast .modal-content {
+  background: #000;
+  border: 2px solid #fff;
+  box-shadow: none;
+}
+
+.modal-badge {
+  width: 7.2rem;
+  height: 7.2rem;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.6rem;
+  margin: 0 auto 2rem;
+}
+
+.modal-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.modal-badge.fail {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  font-size: 3.6rem;
+}
+
+.modal-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.modal-desc {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.modal-desc strong {
+  color: var(--text-main);
+  font-size: 1.8rem;
+}
+
+.new-record-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #000;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  margin-bottom: 2.5rem;
+  animation: pulse 1s infinite alternate;
+}
+
+.high-contrast .new-record-badge {
+  background: #ffff00;
+  color: #000;
+  animation: none;
+  border: 1px solid #fff;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-btn {
+  padding: 1.2rem 2.4rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.primary-btn {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+}
+
+.primary-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+}
+
+.secondary-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   8. Keyframes Animations
+   ========================================================================== */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes bounceUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes bounceDown {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(8px); }
+}
+
+@keyframes pulseUp {
+  0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+  100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
+}
+
+@keyframes pulseDown {
+  0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+  100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.15); }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
